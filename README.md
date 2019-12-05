@@ -1,0 +1,62 @@
+# A Static Site using Docker and Nginx
+
+This repo contains code for building a simple static website served using an Nginx container inside Docker. The code for the site is contained in index.html, and the Nginx config is in default.conf. The Dockerfile contains commands to build a Docker Image.
+
+To build a Docker image from the Dockerfile, run the following command from inside this directory
+
+```bash
+$ docker build -t <docker-hub-username>/meetup:unstable .
+```
+
+
+This will produce the following output
+```bash
+Sending build context to Docker daemon 81.41 kB
+Step 1/3 : FROM nginx:alpine
+ ---> 2f3c6710d8f2
+Step 2/3 : COPY default.conf /etc/nginx/conf.d/default.conf
+ ---> Using cache
+ ---> 176c56cc07b6
+Step 3/3 : COPY index.html /usr/share/nginx/html/index.html
+ ---> 3407953dafd0
+Removing intermediate container cb64bb3e3aca
+Successfully built 3407953dafd0
+```
+
+Log into the Docker Hub from the command line
+```bash
+$ docker login --username=<docker-hub-username>
+```
+
+Push image to Docker Hub
+```bash
+$ docker push <docker-hub-username>/meetup:unstable
+```
+
+To run the image in a Docker container, use the following command:
+```bash
+$ docker run -itd --name meetup --publish 80:80 <docker-hub-username>/meetup:unstable
+```
+
+This will start serving the static site on port 80. If you visit http://localhost in your browser, you should be able to see our static site!
+
+Running ouroboros
+
+```bash
+docker run --rmd --name ouroboros \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    -e LOG_LEVEL=debug \
+    -e INTERVAL=30 \
+    pyouroboros/ouroboros:latest
+```
+
+### Setup on Debian Buster
+```bash
+sudo apt update -y \
+    && sudo apt upgrade -y \
+    && sudo apt install docker.io docker-compose wget -y \
+    && sudo usermod -aG docker $USER \
+    && newgrp docker
+```
+
+https://grafana.com/grafana/dashboards/9728
